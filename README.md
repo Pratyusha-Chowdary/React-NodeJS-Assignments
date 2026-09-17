@@ -14,7 +14,7 @@ This repository contains assignments for the React and Node JS Lab.
 ## Assignments
 
 ### Assignment 1
-[User Authentication System](./Assignment-01-Authentication/README.md)
+Coming Soon
 
 ### Assignment 2
 Coming Soon
