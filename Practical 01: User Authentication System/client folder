@@ -1,0 +1,668 @@
+//client/src/App.jsx
+
+
+import { useState } from "react";
+
+import Register from "./components/Register";
+import Login from "./components/Login";
+import Dashboard from "./components/Dashboard";
+import Logout from "./components/Logout";
+
+import "./App.css";
+
+function App() {
+    const [page, setPage] = useState("login");
+
+    const handleRegisterSuccess = () => {
+        setPage("login");
+    };
+
+    const handleLoginSuccess = () => {
+        setPage("dashboard");
+    };
+
+    const handleLogout = () => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        setPage("login");
+    };
+
+    return (
+        <div className="app">
+            {page === "register" && (
+                <Register
+                    onRegisterSuccess={handleRegisterSuccess}
+                />
+            )}
+
+            {page === "login" && (
+                <Login
+                    onLoginSuccess={handleLoginSuccess}
+                    onRegister={() => setPage("register")}
+                />
+            )}
+
+            {page === "dashboard" && (
+                <Dashboard onLogout={handleLogout} />
+            )}
+        </div>
+    );
+}
+
+export default App;
+
+
+
+
+
+
+
+// -> client/src/components/Register.jsx
+
+import { useState } from "react";
+import "../styles/Register.css";
+
+function Register({ onRegisterSuccess }) {
+
+const [form, setForm] = useState({
+name: "",
+email: "",
+password: ""
+});
+
+const [message, setMessage] = useState("");
+
+const handleChange = (e) => {
+
+setForm({
+    ...form,
+    [e.target.name]: e.target.value
+});
+
+};
+
+const handleSubmit = async (e) => {
+
+e.preventDefault();
+
+setMessage("");
+
+try {
+
+    const response = await fetch(
+        "http://localhost:5002/api/auth/register",
+        {
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify(form)
+        }
+    );
+
+    const data = await response.json();
+
+    if (response.ok) {
+
+        setMessage(data.message);
+
+        setForm({
+            name: "",
+            email: "",
+            password: ""
+        });
+
+        setTimeout(() => {
+            onRegisterSuccess();
+        }, 1000);
+
+    } else {
+
+        setMessage(data.message);
+
+    }
+
+} catch (error) {
+
+    console.error(error);
+
+    setMessage(
+        "Unable to connect to server"
+    );
+
+}
+};
+
+return (
+
+<div className="register-page">
+
+    <div className="register-left">
+
+        <div className="brand-content">
+
+            <h1>StudentMart</h1>
+
+            <h2>
+                Your Student Shopping
+                Destination
+            </h2>
+
+            <p>
+                Create your account and
+                start exploring StudentMart.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div className="register-right">
+
+        <div className="register-card">
+
+            <h1>Create Account</h1>
+
+            <p className="subtitle">
+                Register to continue
+            </p>
+
+
+            <form onSubmit={handleSubmit}>
+
+                <div className="input-group">
+
+                    <label>
+                        Full Name
+                    </label>
+
+                    <input
+                        type="text"
+                        name="name"
+                        placeholder="Enter your full name"
+                        value={form.name}
+                        onChange={handleChange}
+                        required
+                    />
+
+                </div>
+
+
+                <div className="input-group">
+
+                    <label>
+                        Email Address
+                    </label>
+
+                    <input
+                        type="email"
+                        name="email"
+                        placeholder="Enter your email"
+                        value={form.email}
+                        onChange={handleChange}
+                        required
+                    />
+
+                </div>
+
+
+                <div className="input-group">
+
+                    <label>
+                        Password
+                    </label>
+
+                    <input
+                        type="password"
+                        name="password"
+                        placeholder="Enter your password"
+                        value={form.password}
+                        onChange={handleChange}
+                        required
+                        minLength="6"
+                    />
+
+                </div>
+
+
+                {message && (
+                    <p className="register-message">
+                        {message}
+                    </p>
+                )}
+
+
+                <button
+                    type="submit"
+                    className="register-button"
+                >
+                    Create Account
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+);
+}
+
+export default Register;
+
+
+
+
+
+
+
+
+
+//client/src/components/Login.jsx 
+
+
+import { useState } from "react";
+import "../styles/Login.css";
+
+function Login({ onLoginSuccess, onRegister }) {
+
+    const [form, setForm] = useState({
+        email: "",
+        password: ""
+    });
+
+    const [message, setMessage] = useState("");
+
+    const handleChange = (e) => {
+
+        setForm({
+            ...form,
+            [e.target.name]: e.target.value
+        });
+
+    };
+
+
+    //first program code
+    // const handleSubmit = async (e) => {
+
+    //     e.preventDefault();
+
+    //     setMessage("");
+
+    //     try {
+
+    //         const response = await fetch(
+    //             "http://localhost:5002/api/auth/login",
+    //             {
+    //                 method: "POST",
+
+    //                 headers: {
+    //                     "Content-Type": "application/json"
+    //                 },
+
+    //                 body: JSON.stringify(form)
+    //             }
+    //         );
+
+    //         const data = await response.json();
+
+    //         if (response.ok) {
+
+    //             localStorage.setItem(
+    //                 "user",
+    //                 JSON.stringify(data.user)
+    //             );
+
+    //             setMessage(data.message);
+
+    //             setTimeout(() => {
+    //                 onLoginSuccess();
+    //             }, 500);
+
+    //         } else {
+
+    //             setMessage(data.message);
+
+    //         }
+
+    //     } catch (error) {
+
+    //         console.error(error);
+
+    //         setMessage(
+    //             "Unable to connect to server"
+    //         );
+
+    //     }
+    // };
+
+
+//second program code
+const handleSubmit = async (e) => {
+    e.preventDefault();
+    setMessage("");
+
+    try {
+        const response = await fetch(
+            "http://localhost:5002/api/auth/login",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(form)
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            setMessage(data.message || "Login failed");
+            return;
+        }
+
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
+
+        setMessage(data.message);
+        onLoginSuccess();
+    } catch (error) {
+        console.error(error);
+        setMessage("Unable to connect to server");
+    }
+};
+
+
+
+
+
+    return (
+
+        <div className="login-page">
+
+            <div className="login-card">
+
+                <div className="login-logo">
+                    StudentMart
+                </div>
+
+                <h1>Welcome Back!</h1>
+
+                <p className="login-subtitle">
+                    Login to access your account
+                </p>
+
+
+                <form onSubmit={handleSubmit}>
+
+                    <div className="login-input-group">
+
+                        <label>
+                            Email Address
+                        </label>
+
+                        <input
+                            type="email"
+                            name="email"
+                            placeholder="Enter your email"
+                            value={form.email}
+                            onChange={handleChange}
+                            required
+                        />
+
+                    </div>
+
+
+                    <div className="login-input-group">
+
+                        <label>
+                            Password
+                        </label>
+
+                        <input
+                            type="password"
+                            name="password"
+                            placeholder="Enter your password"
+                            value={form.password}
+                            onChange={handleChange}
+                            required
+                        />
+
+                    </div>
+
+
+                    {message && (
+                        <p className="login-message">
+                            {message}
+                        </p>
+                    )}
+
+
+                    <button
+                        type="submit"
+                        className="login-button"
+                    >
+                        Login
+                    </button>
+
+                </form>
+
+
+                <div className="register-link">
+
+                    <span>
+                        Don't have an account?
+                    </span>
+
+                    <button
+                        onClick={onRegister}
+                    >
+                        Create Account
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+    );
+}
+
+export default Login;
+
+
+
+
+//client/src/components/Logout.jsx
+
+function Logout() {
+
+    const handleLogout = () => {
+
+        localStorage.removeItem("user");
+
+        alert("Logged out successfully");
+    };
+
+    return (
+        <div className="logout-section">
+
+            <h2>Account</h2>
+
+            <p>
+                Already logged in?
+            </p>
+
+            <button
+                onClick={handleLogout}
+                className="logout-button"
+            >
+                Logout
+            </button>
+
+        </div>
+    );
+}
+
+export default Logout;
+
+
+
+
+
+//->client/src/components.Dashboard.jsx 
+
+import { useEffect, useState } from "react";
+import "../styles/Dashboard.css";
+
+function Dashboard({ onLogout }) {
+
+    const [user, setUser] = useState(null);
+
+    useEffect(() => {
+
+        const storedUser =
+            localStorage.getItem("user");
+
+        if (storedUser) {
+
+            setUser(
+                JSON.parse(storedUser)
+            );
+
+        }
+
+    }, []);
+
+    if (!user) {
+
+        return (
+            <div className="dashboard-page">
+
+                <div className="dashboard-card">
+
+                    <h2>
+                        No user logged in
+                    </h2>
+
+                </div>
+
+            </div>
+        );
+    }
+
+    return (
+
+        <div className="dashboard-page">
+
+            <nav className="dashboard-navbar">
+
+                <div className="dashboard-logo">
+                    StudentMart
+                </div>
+
+                <button
+                    onClick={onLogout}
+                    className="nav-logout-button"
+                >
+                    Logout
+                </button>
+
+            </nav>
+
+
+            <main className="dashboard-content">
+
+                <div className="welcome-section">
+
+                    <h1>
+                        Welcome, {user.name}! 👋
+                    </h1>
+
+                    <p>
+                        You have successfully logged
+                        into your StudentMart account.
+                    </p>
+
+                </div>
+
+
+                <div className="dashboard-card">
+
+                    <h2>
+                        My Profile
+                    </h2>
+
+                    <div className="profile-icon">
+                        {user.name
+                            .charAt(0)
+                            .toUpperCase()}
+                    </div>
+
+
+                    <div className="profile-details">
+
+                        <div className="profile-row">
+
+                            <span>
+                                Name
+                            </span>
+
+                            <strong>
+                                {user.name}
+                            </strong>
+
+                        </div>
+
+
+                        <div className="profile-row">
+
+                            <span>
+                                Email
+                            </span>
+
+                            <strong>
+                                {user.email}
+                            </strong>
+
+                        </div>
+
+
+                        <div className="profile-row">
+
+                            <span>
+                                User ID
+                            </span>
+
+                            <strong>
+                                {user.id}
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <button
+                        onClick={onLogout}
+                        className="dashboard-logout-button"
+                    >
+                        Logout
+                    </button>
+
+                </div>
+
+            </main>
+
+        </div>
+    );
+}
+
+export default Dashboard;
+
+
